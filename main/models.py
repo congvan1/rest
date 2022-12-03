@@ -10,7 +10,7 @@ class Student(models.Model):
     grade = models.IntegerField()
 
 class Teacher(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='teacher', null=True)
     name = models.CharField(max_length=50)
     age = models.IntegerField()
     address = models.CharField(max_length=200)
@@ -20,7 +20,7 @@ class Teacher(models.Model):
     avatar = models.ImageField(upload_to='images', null=False, default=None)
 
 class ClassEng(models.Model):
-    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, related_name='classEng', null=True)
     level = models.IntegerField()
     description = models.CharField(max_length=1000)
     fee = models.CharField(max_length=50)
