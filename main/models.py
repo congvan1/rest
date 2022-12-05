@@ -1,8 +1,13 @@
 from django.db import models
-from django.contrib.auth.models import User
-        
+
+class UserAccount(models.Model):
+    username = models.CharField(max_length=50, null=False, unique = True)
+    password = models.CharField(max_length=50, null=False)
+    r = [('STUDENT','Học sinh'),('TEACHER','Gia sư')]
+    role = models.CharField(max_length=10, null=False, choices=r, default='STUDENT')
+
 class Student(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='student', null=True)
+    user = models.OneToOneField(UserAccount, on_delete=models.CASCADE, related_name='student', null=False,primary_key=True)
     name = models.CharField(max_length=50)
     age = models.IntegerField()
     city = models.CharField(max_length=200)
@@ -10,17 +15,17 @@ class Student(models.Model):
     grade = models.IntegerField()
 
 class Teacher(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='teacher', null=True)
+    user = models.OneToOneField(UserAccount, on_delete=models.CASCADE,primary_key=True)
     name = models.CharField(max_length=50)
     age = models.IntegerField()
     address = models.CharField(max_length=200)
     phone = models.CharField(max_length=50)
-    license = models.CharField(max_length=100)
-    image_license = models.ImageField(upload_to='images', null=False, default=None)
-    avatar = models.ImageField(upload_to='images', null=False, default=None)
+    licenses = models.CharField(max_length=100, default='None')
+    image_license = models.ImageField(upload_to='images', null=True, default=None)
+    avatar = models.ImageField(upload_to='images', null=True, default=None)
 
 class ClassEng(models.Model):
-    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, related_name='classEng', null=True)
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     level = models.IntegerField()
     description = models.CharField(max_length=1000)
     fee = models.CharField(max_length=50)
