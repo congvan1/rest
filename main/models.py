@@ -7,7 +7,7 @@ class UserAccount(models.Model):
     role = models.CharField(max_length=10, null=False, choices=r, default='STUDENT')
 
 class Student(models.Model):
-    user = models.OneToOneField(UserAccount, on_delete=models.CASCADE, related_name='student', null=False,primary_key=True)
+    id_user = models.OneToOneField(UserAccount, on_delete=models.CASCADE, related_name='student', null=False)
     name = models.CharField(max_length=50)
     age = models.IntegerField()
     city = models.CharField(max_length=200)
@@ -15,7 +15,7 @@ class Student(models.Model):
     grade = models.IntegerField()
 
 class Teacher(models.Model):
-    user = models.OneToOneField(UserAccount, on_delete=models.CASCADE,primary_key=True)
+    id_user = models.OneToOneField(UserAccount, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     age = models.IntegerField()
     address = models.CharField(max_length=200)
@@ -23,10 +23,11 @@ class Teacher(models.Model):
     licenses = models.CharField(max_length=100, default='None')
     image_license = models.ImageField(upload_to='images', null=True, default=None)
     avatar = models.ImageField(upload_to='images', null=True, default=None)
+    describe_detail = models.CharField(max_length=1000, null=False, default="Chào bạn tôi là gia sư tiếng anh")
 
-class ClassEng(models.Model):
-    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
-    level = models.IntegerField()
-    description = models.CharField(max_length=1000)
-    fee = models.CharField(max_length=50)
-    is_valid = models.BooleanField(default=True)
+class Rate(models.Model):
+    id_student = models.OneToOneField(Student,on_delete=models.CASCADE)
+    id_teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    trinh_do_su_pham = models.IntegerField(default=2) # 2.5
+    chuyen_mon = models.IntegerField(default=2)  #    1.5
+    su_yeu_thich = models.IntegerField(default=2) #  1

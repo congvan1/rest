@@ -2,8 +2,8 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Student, Teacher, ClassEng, UserAccount
-from .serializers import StudentSerializers, TeacherSerializers, ClassEngSerializers, UserAccountSerializers, UserStudentSerializers, UserTeacherSerializers
+from .models import Student, Teacher, Rate, UserAccount
+from .serializers import StudentSerializers, TeacherSerializers, RateSerializers, UserAccountSerializers, UserStudentSerializers, UserTeacherSerializers
 
 # Create your views here.
 class UserAccountView(viewsets.ModelViewSet):
@@ -29,7 +29,28 @@ class StudentView(viewsets.ModelViewSet):
 class TeacherView(viewsets.ModelViewSet):
     queryset = Teacher.objects.all()
     serializer_class = TeacherSerializers
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        serializers = TeacherSerializers(data=data)
+        try:
+            if serializers.is_valid(raise_exception=True):
+                teacher = serializers.save()
+                Rate.objects.create(teacher=teacher)
+                return Response(data="Teacher created",status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)           
+
+    @action(detail=True,methods=['GET'])
+    def GetRate(self,request,pk):
+        try:
+            teacher = Teacher.objects.filter(id=pk)
+            rating = Rate.objects.filter(id_teacher=teacher[0].id)
+            serializer = RateSerializers(rating,many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            return Response({"error :":str(e)},status=status.HTTP_404_NOT_FOUND)
+
     
-class ClassEngView(viewsets.ModelViewSet):
-    queryset = ClassEng.objects.all()
-    serializer_class = ClassEngSerializers
+class RateView(viewsets.ModelViewSet):
+    queryset = Rate.objects.all()
+    serializer_class = RateSerializers
