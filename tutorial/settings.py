@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-fj6lycrheeoc51*6vf3+f8ku=5(7y(@19_&3h^sc*7v0^$x70t'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ["159.89.206.94"]
+ALLOWED_HOSTS = ["159.89.206.94","127.0.0.1","d7d8-123-19-58-37.ap.ngrok.io","localhost","nhanphan.pythonanywhere.com"]
 
 
 # Application definition
@@ -36,9 +36,10 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
     'rest_framework',
     'main.apps.MainConfig',
+    'django.contrib.staticfiles',  # required for serving swagger ui's css/js files
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
