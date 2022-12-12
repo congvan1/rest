@@ -6,8 +6,6 @@ class UserAccountSerializers(serializers.ModelSerializer):
     class Meta:
         model = UserAccount
         fields = '__all__'
-        extra_kwargs = {'password': {'write_only': True}}
-
 class StudentSerializers(serializers.ModelSerializer):
     class Meta:
         model = Student
