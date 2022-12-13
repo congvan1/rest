@@ -18,6 +18,7 @@ class Teacher(models.Model):
     id_user = models.OneToOneField(UserAccount, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     age = models.IntegerField()
+    city = models.CharField(max_length=20, default="Da Nang")
     address = models.CharField(max_length=200)
     phone = models.CharField(max_length=50)
     licenses = models.CharField(max_length=100, default='None')
@@ -31,3 +32,12 @@ class Rate(models.Model):
     trinh_do_su_pham = models.IntegerField(default=2) # 2.5
     chuyen_mon = models.IntegerField(default=2)  #    1.5
     su_yeu_thich = models.IntegerField(default=2) #  1
+
+class InformationClass(models.Model):
+    id_teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    ten_lop = models.CharField(max_length=50, unique=True, null=False)
+    lop = models.IntegerField(default=2,null=False)
+    hoc_phi = models.CharField(max_length=10)
+    mo_ta = models.CharField(max_length=100)
+    thoi_gian = models.FloatField(default=2,null=False)
+    buoi = models.CharField(max_length=50)

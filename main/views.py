@@ -2,8 +2,9 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Student, Teacher, Rate, UserAccount
-from .serializers import StudentSerializers, TeacherSerializers, RateSerializers, UserAccountSerializers, UserStudentSerializers, UserTeacherSerializers
+from django_filters.rest_framework import DjangoFilterBackend
+from .models import Student, Teacher, Rate, UserAccount, InformationClass
+from .serializers import StudentSerializers, TeacherSerializers, RateSerializers, UserAccountSerializers, UserStudentSerializers, UserTeacherSerializers, InformationClassSerializers
 
 # Create your views here.
 class UserAccountView(viewsets.ModelViewSet):
@@ -29,6 +30,8 @@ class StudentView(viewsets.ModelViewSet):
 class TeacherView(viewsets.ModelViewSet):
     queryset = Teacher.objects.all()
     serializer_class = TeacherSerializers
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['city']
     def create(self, request, *args, **kwargs):
         data = request.data
         serializers = TeacherSerializers(data=data)
@@ -49,8 +52,21 @@ class TeacherView(viewsets.ModelViewSet):
             return Response(serializer.data)
         except Exception as e:
             return Response({"error :":str(e)},status=status.HTTP_404_NOT_FOUND)
+    @action(detail=True,methods=["Get"])
+    def GetClass(self,request,pk):
+        try:
+            teacher = Teacher.objects.filter(id=pk)
+            classes = Rate.objects.filter(id_teacher=teacher[0].id)
+            serializer = InformationClassSerializers(classes,many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            return Response({"error :":str(e)},status=status.HTTP_404_NOT_FOUND)
 
     
 class RateView(viewsets.ModelViewSet):
     queryset = Rate.objects.all()
     serializer_class = RateSerializers
+    
+class InfortionClassView(viewsets.ModelViewSet):
+    queryset = InformationClass.objects.all()
+    serializer_class = InformationClassSerializers
