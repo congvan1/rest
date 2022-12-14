@@ -3,12 +3,62 @@ from django.urls import reverse
 from rest_framework.test import APITestCase
 from .models import *
 # Create your tests here.
+class test_account(APITestCase):
+    url = '/accounts/'
+    
+    def setUp(self):
+        UserAccount.objects.create(username='van', password='123')
+        
+    def test_get_account(self):
+        response = self.client.get(self.url)
+        result = response.json()
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(result, list)
+        self.assertEqual(result[0]['username'], 'van')
+        
+    def test_post_account(self):
+        data = {
+            "username": "nhan",
+            "password": "123",
+            "role": "STUDENT"
+        }
+        response = self.client.post(self.url, data=data)
+        result = response.json()
+        
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(result["username"], 'nhan')
+        
+    def test_update_account(self):
+        pk = '1/'
+        data = {
+            "username": "nhan (updated)",
+            "password": "123",
+            "role": "STUDENT"
+        }
+        response = self.client.patch(self.url + pk, data=data)
+        result = response.json()
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(result["username"], 'nhan (updated)')
+    
+    def test_delete_account(self):
+        pk = '1/'
 
+        response_delete = self.client.delete(self.url + pk)
+        response_get = self.client.get(self.url + pk)
+        result = response_get.json()
+        
+        self.assertEqual(response_delete.status_code, 204)
+        self.assertEqual(response_get.status_code, 404)
 class test_student(APITestCase):
     url = '/students/'
     
     def setUp(self):
-        Student.objects.create(name='tuan', age=1, grade=1)
+        user = UserAccount.objects.create(username='van', password='123')
+        user2 = UserAccount.objects.create(username='van1', password='123')
+
+        student = Student.objects.create(id_user=user, name='tuan', age=1, grade=12)
         
     def test_get_student(self):
         response = self.client.get(self.url)
@@ -19,33 +69,36 @@ class test_student(APITestCase):
         self.assertEqual(result[0]['name'], 'tuan')
         
     def test_post_student(self):
+
         data = {
-            "name": "tuan",
-            "age": 16,
-            "city": "HCM",
-            "school_name": "DUT",
-            "grade": 10,
+            "name": "Thanh Nhân",
+            "age": 21,
+            "city": "Da Nang",
+            "school_name": "Hoa Vang",
+            "grade": 12,
+            'id_user': 2
         }
         response = self.client.post(self.url, data=data)
         result = response.json()
-
+        
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(result["name"], 'tuan')
+        self.assertEqual(result["name"], 'Thanh Nhân')
         
     def test_update_student(self):
         pk = '1/'
         data = {
-            "name": "tuan (updated)",
-            "age": 16,
-            "city": "HCM",
-            "school_name": "DUT",
-            "grade": 10,
+            "name": "Thanh Nhân (updated)",
+            "age": 21,
+            "city": "Da Nang",
+            "school_name": "Hoa Vang",
+            "grade": 12,
+            'id_user': 2
         }
         response = self.client.patch(self.url + pk, data=data)
         result = response.json()
         
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(result["name"], 'tuan (updated)')
+        self.assertEqual(result["name"], 'Thanh Nhân (updated)')
         
     def test_delete_student(self):
         pk = '1/'
@@ -61,7 +114,8 @@ class test_student(APITestCase):
 class test_teacher(APITestCase):
     url_teacher = '/teachers/'
     def setUp(self):
-        Teacher.objects.create(name='GV Hoa', age=1)
+        user1 = UserAccount.objects.create(username='van', password='123')
+        Teacher.objects.create(id_user=user1, name='GV Hoa', age=1)
         
     def test_get_teacher(self):
         response = self.client.get(self.url_teacher)
@@ -70,87 +124,67 @@ class test_teacher(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(result, list)
         self.assertEqual(result[0]['name'], 'GV Hoa')
-       
-    def test_post_teacher(self):
-        data = {
-            "name": "giao vien A",
-            "age": 33,
-            "address": "HA NOI",
-            "phone": "0905123456",
-            "license": "toiec",
-        }
-        response = self.client.post(self.url_teacher, data=data)
-        result = response.json()
 
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(result["name"], 'giao vien A')
-        
-    def test_update_teacher(self):
-        pk = '1/'
-        data = {
-            "name": "giao vien A (updated)",
-            "age": 33,
-            "address": "HA NOI",
-            "phone": "0905123456",
-            "license": "toiec",
-        }
-        response = self.client.patch(self.url_teacher + pk, data=data)
-        result = response.json()
-        
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(result["name"], 'giao vien A (updated)')
-        
-    def test_delete_teacher(self):
-        pk = '1/'
-
-        response_delete = self.client.delete(self.url_teacher + pk)
-        response_get = self.client.get(self.url_teacher + pk)
-        
-        self.assertEqual(response_delete.status_code, 204)
-        self.assertEqual(response_get.status_code, 404)
-
-
-class test_class_english(APITestCase):
-    url_class_english = '/classEngs/'
+class test_(APITestCase):
+    url = '/rates/'
     def setUp(self):
-        ClassEng.objects.create(level=450, description='lớp học toiec cho người mới, target 450 điểm')
+        user1 = UserAccount.objects.create(username='van', password='123')
+        student = Student.objects.create(id_user=user1, name='GV Hoa', age=1, grade=12)
         
-    def test_get_class_english(self):
-        response = self.client.get(self.url_class_english)
+        user2 = UserAccount.objects.create(username='van2', password='123')
+        teacher = Teacher.objects.create(id_user=user2, name='GV Hoa 222', age=1)
+        
+        Rate.objects.create(id_student=student, id_teacher=teacher, chuyen_mon=1)
+        
+        user3 = UserAccount.objects.create(username='van32', password='123')
+        Student.objects.create(id_user=user3, name='GV Hoa', age=1, grade=12)
+        
+        user4 = UserAccount.objects.create(username='van23', password='123')
+        teacher = Teacher.objects.create(id_user=user4, name='GV Hoa 222', age=1)
+        
+    def test_get_rate(self):
+        response = self.client.get(self.url)
         result = response.json()
         
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(result, list)
-        self.assertEqual(result[0]['description'], 'lớp học toiec cho người mới, target 450 điểm')
-       
-    def test_post_class_english(self):
+        self.assertEqual(result[0]['chuyen_mon'], 1)
+        
+    def test_post_rate(self):
         data = {
-            "level": 450,
-            "description": "lớp học toiec cho người mới, target 450 điểm",
-            "fee": "1300000",
+            "trinh_do_su_pham": 2,
+            "chuyen_mon": 2,
+            "su_yeu_thich": 2,
+            "id_student": 2,
+            "id_teacher": 2
         }
-        response = self.client.post(self.url_class_english, data=data)
+        response = self.client.post(self.url, data=data)
         result = response.json()
 
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(result["level"], 450)
+        self.assertEqual(result["chuyen_mon"], 2)
         
-    def test_update_class_english(self):
+        
+    def test_update_rate(self):
         pk = '1/'
         data = {
-            "level": 700,
+            "trinh_do_su_pham": 2,
+            "chuyen_mon": 3,
+            "su_yeu_thich": 2,
+            "id_student": 2,
+            "id_teacher": 2
         }
-        response = self.client.patch(self.url_class_english + pk, data=data)
+        response = self.client.patch(self.url + pk, data=data)
         result = response.json()
         
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(result["level"], 700)
+        self.assertEqual(result["chuyen_mon"], 3)
         
-    def test_delete_class_english(self):
+    def test_delete_rate(self):
         pk = '1/'
 
-        response_delete = self.client.delete(self.url_class_english + pk)
-        response_get = self.client.get(self.url_class_english + pk)
+        response_delete = self.client.delete(self.url + pk)
+        response_get = self.client.get(self.url + pk)
         
         self.assertEqual(response_delete.status_code, 204)
         self.assertEqual(response_get.status_code, 404)
